@@ -57,13 +57,22 @@ def  saveimg(url,num,page):
                     print(str(e)+"下载再次出错，终止！")
 #批量下载，控制页码
 
-for page in range(0,360):
-    num=0
-    url="http://jandan.net/ooxx/page-"+str(page)
-    _z=getcontent(url,header)
-    _imgurls=getimgurl(_z)
-    for imgurl in _imgurls:
-        num=num+1
-        saveimg(str(imgurl),num,page)
-    print("第",page,"页，已下载")
+if __name__=='__main__':
+    try:
+        for page in range(2320,2360):
+            p=Pool(5)
+            num=0
+            url="http://jandan.net/ooxx/page-"+str(page)
+            _z=getcontent(url,header)
+            _imgurls=getimgurl(_z)
+            
+            for imgurl in _imgurls:
+                num=num+1
+                p.apply_async(saveimg,args=(str(imgurl),num,page,))
+            p.close()
+            p.join()
+            time.sleep(10)
+            print("第",page,"页，已下载")
+    except Exception as e:
+        print("多进程异常->",e)
 print("程序结束")
